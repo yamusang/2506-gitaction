@@ -10,9 +10,9 @@ const NavBar = () => {
       {isAuthenticated() && (
         <div>
           <Link to="/myposts">내 포스트</Link>
+          <Link to="/boardList">전체 글</Link>
         </div>
       )}
-      <Link to="/boardList">전체 글</Link>
       {isAuthenticated() ? <Logout /> : <Link to="/login">로그인</Link>}
     </nav>
   );
