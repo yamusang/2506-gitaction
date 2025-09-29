@@ -22,9 +22,9 @@ const App = () => {
           <Route
             path="/boardlist"
             element={
-              <ProtectedRoute>
+              <PublicRoute>
                 <BoardList />
-              </ProtectedRoute>
+              </PublicRoute>
             }
           />
           <Route
