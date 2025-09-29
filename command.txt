@@ -1,0 +1,10 @@
+docker run -d \
+-p 1521:1521 \
+-e ORACLE_PASSWORD=oracle \
+--restart unless-stopped \
+-e ORACLE_ALLOW_REMOTE=true \
+-v oracle_data:/opt/oracle/oradata \
+gvenzl/oracle-xe:21-slim
+
+👉 docker images 했을 때 이미지가 있으면 그것으로 실행
+👉 docker images 했을 때 

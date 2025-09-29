@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: spring_9jwt
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    #실습 1. 윈도우 설치한 오라클 서버(다른 서버롯 접속)
+    #url: jdbc:oracle:thin:@//192.168.0.109:1521/xe
+    #실습 2. 가상 머신 리눅스에 컨테이너 실행 중인 오라클 서버
+    url: jdbc:oracle:thin:@//localhost:1521/xepdb1?oracle.jdbc.timezoneAsRegion=false
+    username: idev
+    password: 1234
+    hikari:
+      connection-init-sql: "ALTER SESSION SET TIME_ZONE = 'Asia/Seoul'"
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        '[format_sql]': true
+      jdbc:
+          time_zone: Asia/Seoul   # ✅ 추가: Hibernate가 UTC 대신 KST로 동작
+    defer-datasource-initialization: true        
+logging:
+  level:
+    '[org.iclass.spring_9jwt]': DEBUG
+    '[org.springframework.security]': DEBUG
+  pattern:
+    console: '%clr(%-5level){yellow} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n'
+springdoc:
+  swagger-ui:
+    enabled: true
+    try-it-out-enabled: true
+  api-docs: 
+    enabled: true
+server:
+  port: 8080    
+# http://localhost:8080/swagger-ui/index.html
+# http://localhost:8080/v3/api-docs(OpenAPI JSON 문서)
+

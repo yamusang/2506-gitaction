@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: spring_9jwt
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    #실습3. 백엔드 애플리케이션 컨테이너에서 오라클 컨테이너 데이터베이스로 connect 하기 
+    #동일한 도커 네트워크 안에서의 통신이므로 docker gateway ip
+    url: jdbc:oracle:thin:@//172.17.0.1:1521/xepdb1
+    username: idev
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        '[format_sql]': true
+    defer-datasource-initialization: true        
+logging:
+  level:
+    '[org.iclass.spring_9jwt]': DEBUG
+    '[org.springframework.security]': DEBUG
+  pattern:
+    console: '%clr(%-5level){yellow} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n'
+springdoc:
+  swagger-ui:
+    enabled: true
+    try-it-out-enabled: true
+  api-docs: 
+    enabled: true
+server:
+  port: 8080    
+# http://localhost:8080/swagger-ui/index.html
+# http://localhost:8080/v3/api-docs(OpenAPI JSON 문서)
+

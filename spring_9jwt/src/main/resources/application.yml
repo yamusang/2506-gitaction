@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: spring_9jwt
+  config:
+    import: "optional:file:.env[.properties]"
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 3
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #실습4. AWS EC2 백엔드 컨테이너가 AWS RDS로 접속
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        '[format_sql]': true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true        
+logging:
+  level:
+    '[org.iclass.spring_9jwt]': DEBUG
+    '[org.springframework.security]': DEBUG
+  pattern:
+    console: '%clr(%-5level){yellow} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n'
+springdoc:
+  swagger-ui:
+    enabled: true
+    try-it-out-enabled: true
+  api-docs: 
+    enabled: true
+server:
+  port: 8080    
+# http://localhost:8080/swagger-ui/index.html
+# http://localhost:8080/v3/api-docs(OpenAPI JSON 문서)
+

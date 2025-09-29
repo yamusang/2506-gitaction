@@ -1,0 +1,69 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # ---------------------------
+      # 1️⃣ Build & Push Docker images
+      # ---------------------------
+      - name: Build & Push Backend Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/spring_9jwt-final ./spring_9jwt
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/spring_9jwt-final
+
+      - name: Build & Push Frontend Docker image
+        run: |
+          docker build \
+          --build-arg VITE_REQ_API_HOST=http://13.124.192.99:8080 \
+          -t ${{ secrets.DOCKER_HUB_USERNAME }}/react-auth-final ./routerAndjwt
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/react-auth-final
+
+      # ---------------------------
+      # 2️⃣ Deploy to EC2 via SSH
+      # ---------------------------
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Pull latest images
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/spring_9jwt-final
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/react-auth-final
+
+            # Stop and remove existing containers if running
+            docker stop spring_9jwt-final || true
+            docker rm spring_9jwt-final || true
+            docker stop react-auth-final || true
+            docker rm react-auth-final || true
+
+            # Run Spring Boot container 
+            docker run -d --name spring_9jwt-final  \
+            -p 8080:8080 \
+            --env-file ~/app-config/.env \
+            "${{ secrets.DOCKER_HUB_USERNAME }}/spring_9jwt-final"
+
+            # with DB env variables ⤴ env file 을 미리 ec2 에 복사했음
+            # -e DB_DRIVER="${{ secrets.DB_DRIVER }}" \
+            # -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+            # -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \ 
+            # -e DB_URL="${{ secrets.DB_URL }}" \
+
+            # Run Frontend container
+            docker run -d --name react-auth-final \
+            -p 80:80 \
+            "${{ secrets.DOCKER_HUB_USERNAME }}"/react-auth-final
+
